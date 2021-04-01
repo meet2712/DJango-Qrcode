@@ -9,6 +9,7 @@ class Customer(models.Model):
     email = models.CharField(max_length=200, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
 
+
     def __str__(self):
         return self.name
 
@@ -52,7 +53,7 @@ class Order(models.Model):
     note = models.CharField(max_length=1000, null=True)
 
     def __str__(self):
-        return self.product.name
+        return str(self.product)
 
 
 class AccountsProduct(models.Model):
@@ -90,3 +91,17 @@ class AccountsOrder(models.Model):
     class Meta:
         managed = False
         db_table = 'accounts_order'
+
+
+# class contactdetails(models.Model):
+#     full_name = models.CharField(max_length=200, blank=True, null=True)
+#     phone = models.CharField(max_length=200, blank=True, null=True)
+#     email = models.CharField(max_length=200, blank=True, null=True)
+#     message = models.CharField(max_length=1000, blank=True, null=True)
+#
+#     def __str__(self):
+#         return self.full_name.name
+#
+#     class Meta:
+#         managed = False
+#         db_table = 'contact_details'

@@ -68,6 +68,9 @@ def loginPage(request):
         context = {}
         return render(request, 'accounts/login.html', context)
 
+def userOrderPage(request):
+    return redirect('accounts/userOderderPage.html')
+
 import mysql.connector
 
 import pyqrcode
@@ -130,7 +133,7 @@ def statusdisplay(request, order_id):
 
 def logoutUser(request):
     logout(request)
-    return redirect('index')
+    return redirect('login')
 
 
 def contactPage(request):
@@ -139,23 +142,25 @@ def contactPage(request):
 
 @login_required(login_url='login')
 def home(request):
+    x = request.user.username
+    print(x)
     orders = Order.objects.all()
     customers = Customer.objects.all()
 
     total_customers = customers.count()
+    if request.user.username == "admin":
+        total_orders = orders.count()
+        Harvested = orders.filter(status='Harvested').count()
+        Sorting_center = orders.filter(status='Sorting center').count()
+        Quality_check_center = orders.filter(status='quality check center').count()
+        out_for_delivery = orders.filter(status='out for delivery').count()
 
-    total_orders = orders.count()
-    Harvested = orders.filter(status='Harvested').count()
-    Sorting_center = orders.filter(status='Sorting center').count()
-    Quality_check_center = orders.filter(status='quality check center').count()
-    out_for_delivery = orders.filter(status='out for delivery').count()
+        context = {'orders': orders, 'customers': customers,
+                   'total_orders': total_orders, 'Harvested': Harvested,
+                   'Sorting center': Sorting_center, 'quality check center': Quality_check_center,
+                   'out for delivery': out_for_delivery}
 
-    context = {'orders': orders, 'customers': customers,
-               'total_orders': total_orders, 'Harvested': Harvested,
-               'Sorting center': Sorting_center, 'quality check center': Quality_check_center,
-               'out for delivery': out_for_delivery}
-
-    return render(request, 'accounts/dashboard.html', context)
+        return render(request, 'accounts/dashboard.html', context)
 
 
 @login_required(login_url='login')
@@ -167,6 +172,8 @@ def products(request):
 
 @login_required(login_url='login')
 def customer(request, pk_test):
+    x = request.user.username
+    print(x)
     customer = Customer.objects.get(id=pk_test)
 
     orders = customer.order_set.all()
@@ -182,6 +189,8 @@ def customer(request, pk_test):
 
 @login_required(login_url='login')
 def createOrder(request, pk):
+    # x = request.user.username
+    # print(x)
     OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'), extra=10)
     customer = Customer.objects.get(id=pk)
     formset = OrderFormSet(queryset=Order.objects.none(), instance=customer)
